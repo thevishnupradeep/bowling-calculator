@@ -1,3 +1,5 @@
+# Bowling Score Calculator
+
 ```
 npm install
 npm run dev
