@@ -129,6 +129,29 @@ test("Calculate spare frames to correctly", async () => {
     expect(body.score).toBe(37)
 });
 
+test("Calculate all frames to correctly", async () => {
+    const res = await app.request("/calculate/scores", {
+        method: "POST",
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            "scores": [
+                [3, 5], // 8
+                [4, 4], // 16
+                [5, 5], // 26 + 4 = 30
+                [4, 3], // 37
+                [4, 3], // 44
+                [5, 0], // 49
+                [4, 4], // 57
+            ]
+        })
+    });
+    const body = await res.json()
+
+    expect(body.score).toBe(57)
+});
+
 test("Follow 10th frame rules on strike @ 10th frame", async () => {
     const res = await app.request("/calculate/scores", {
         method: "POST",
@@ -206,4 +229,49 @@ test("On Perfect Score", async () => {
     const body = await res.json()
 
     expect(body.score).toBe(300)
+});
+
+test("Convert string to score frame array '/calculate/raw-scores'", async () => {
+    const res = await app.request("/calculate/raw-scores", {
+        method: "POST",
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            "scoreString": "10 10 10"
+        })
+    });
+    const body = await res.json()
+
+    expect(body.score).toBe(50)
+})
+
+test("On Perfect Score String ", async () => {
+    const res = await app.request("/calculate/raw-scores", {
+        method: "POST",
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+             "scoreString": "10 10 10 10 10 10 10 10 10 10 10 10",
+        })
+    });
+    const body = await res.json()
+
+    expect(body.score).toBe(300)
+});
+
+test("Follow 10th frame rules on spare @ 10th frame on score string", async () => {
+    const res = await app.request("/calculate/raw-scores", {
+        method: "POST",
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            "scoreString": "3 5 4 4 5 5 4 3 10 5 4 10 5 5 2 3 4 6 2",
+        })
+    });
+    const body = await res.json()
+
+    expect(body.score).toBe(114)
 });

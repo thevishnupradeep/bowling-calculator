@@ -1,8 +1,9 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator';
-import { CalculateScorePayloadSchema, ScoreFramesSchema, type CalculateScorePayloadType } from './types.js';
-import { calculateScores } from './utils.js';
+import { CalculateScorePayloadSchema, type CalculateScorePayloadType } from './types.js';
+import { calculateScores, scoreStringToArray } from './utils.js';
+import { z } from 'zod';
 
 const app = new Hono()
 
@@ -20,6 +21,21 @@ app.post(
     const body: CalculateScorePayloadType = await c.req.json();
 
     const score = calculateScores(body.scores);
+
+    return c.json({ score })
+  }
+);
+
+app.post(
+  '/calculate/raw-scores',
+  zValidator('json', z.object({ scoreString: z.string() })),
+  async (c) => {
+    const body = await c.req.json();
+
+    console.log("String: ", body.scoreString)
+    const scores = scoreStringToArray(body.scoreString)
+    console.log("scores: ", scores)
+    const score = calculateScores(scores);
 
     return c.json({ score })
   }

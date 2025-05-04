@@ -1,5 +1,47 @@
 import type { ScoreFramesType } from "./types.js";
 
+export const scoreStringToArray = (soreString: string): ScoreFramesType => {
+    const scores = soreString.split(" ");
+
+
+    let cursor = 0;
+    const scoreFrames = scores.reduce<ScoreFramesType>((frames, score, i) => {
+        const scoreNumber = parseInt(score);
+
+        if (cursor === 9) {
+            if (!frames[cursor]) {
+                frames[cursor] = [scoreNumber];
+            } else {
+                frames[cursor].push(scoreNumber);
+            }
+            return frames;
+        }
+
+        if (scoreNumber === 10 && cursor < 9) {
+            frames.push([scoreNumber]);
+            cursor++;
+            return frames;
+        }
+
+        const currentFrame = frames[cursor] || [];
+        
+        if (currentFrame.length === 0) {
+            frames[cursor] = [scoreNumber];
+            return frames;
+        }
+        
+        currentFrame.push(scoreNumber);
+        cursor++;
+        return frames;
+
+    }, []);
+    
+    console.log("scoreFrames: ", scoreFrames)
+
+    return scoreFrames;
+}
+
+
 export const calculateScores = (scores: ScoreFramesType) => {
     const score = scores.reduce((value, frame, i, frames) => {
         let scoreInFrame = 0;
