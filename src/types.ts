@@ -10,4 +10,5 @@ export const CalculateScorePayloadSchema = z.object({
     scores: ScoreFramesSchema
 })
 
+export type ScoreFramesType = z.infer<typeof ScoreFramesSchema>;
 export type CalculateScorePayloadType = z.infer<typeof CalculateScorePayloadSchema>;
